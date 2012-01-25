@@ -10,7 +10,7 @@ var elect = require('../lib').elect;
 
 
 
-/// --- Globals
+// --- Globals
 
 var leader;
 var slaves = [];
@@ -25,7 +25,7 @@ var OPTS = {
 
 
 
-/// --- Tests
+// --- Tests
 
 test('setup', function(t) {
 	zk = new ZooKeeper({
@@ -36,12 +36,12 @@ test('setup', function(t) {
 	});
 
 	async.waterfall([
-		function connect(callback) {
+		function(callback) {
 			return zk.connect(function(err) {
-				return callback(err, '');
+				return callback(err);
 			});
 		},
-		function create(parent, callback) {
+		function(callback) {
 			var node = OPTS.znode;
 			return zk.a_create(node, null, 0, function(rc, msg) {
 				if (rc != 0)
@@ -50,7 +50,7 @@ test('setup', function(t) {
 				return callback(null, node);
 			});
 		}
-	], function done(err) {
+	], function(err) {
 		if (err)
 			t.bailout(err.stack);
 
@@ -100,7 +100,7 @@ test('create slaves', function(t) {
 
 
 test('kill a slave', function(t) {
-	slaves[3].once('watch', function(parent) {
+	slaves[3].once('watch', function() {
 		t.notOk(slaves[3].leader);
 		t.equal(slaves[3].watching, slaves[1].znode);
 		slaves.splice(2, 1);
@@ -109,7 +109,7 @@ test('kill a slave', function(t) {
 	slaves[3].once('leader', function() {
 		t.bailout('Somehow we got made the leader');
 	});
-	slaves[3].once('error', function() {
+	slaves[3].once('error', function(err) {
 		t.bailout(err.stack);
 	});
 
@@ -119,10 +119,10 @@ test('kill a slave', function(t) {
 
 
 test('new leader', function(t) {
-	slaves[0].once('leader', function(parent) {
+	slaves[0].once('leader', function() {
 		t.end();
 	});
-	slaves[0].once('error', function() {
+	slaves[0].once('error', function(err) {
 		t.bailout(err.stack);
 	});
 
@@ -137,8 +137,8 @@ test('teardown', function(t) {
 		if (++finished < slaves.length)
 			return false;
 
-		return zk.a_delete_(OPTS.znode, 0, function(rc, msg) {
-			zk.on('close', function(){
+		return zk.a_delete_(OPTS.znode, 0, function() {
+			zk.on('close', function() {
 				t.end();
 			});
 			zk.close();
