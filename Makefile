@@ -14,6 +14,7 @@ endif
 NPM := npm_config_tar=$(TAR) npm
 
 LINT = ./node_modules/.javascriptlint/build/install/jsl --conf ./.jsl.conf
+RELEASE = python ./node_modules/.cutarelease/cutarelease.py -f package.json
 STYLE = ./node_modules/.jsstyle/jsstyle
 
 TAP = ./node_modules/.bin/tap
@@ -29,14 +30,14 @@ node_modules/.installed:
 
 	if [[ ! -d node_modules/.javascriptlint ]]; then \
 		git clone https://github.com/davepacheco/javascriptlint node_modules/.javascriptlint; \
-	else \
-		(cd node_modules/.javascriptlint && git fetch origin); \
 	fi
 
 	if [[ ! -d node_modules/.jsstlye ]]; then \
 		git clone https://github.com/mcavage/jsstyle node_modules/.jsstyle; \
-	else \
-		(cd node_modules/.jsstyle && git fetch origin); \
+	fi
+
+	if [[ ! -d node_modules/.cutarelease ]]; then \
+		git clone https://github.com/trentm/cutarelease node_modules/.cutarelease; \
 	fi
 
 	@(cd ./node_modules/.javascriptlint && $(MAKE) install)
@@ -58,6 +59,9 @@ _test:
 	$(NPM) test
 
 test: install _test lint
+
+release: test
+	$(RELEASE)
 
 clean:
 	@rm -fr node_modules *.log
