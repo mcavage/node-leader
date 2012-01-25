@@ -1,5 +1,5 @@
 # node-leader Changelog
 
-## 0.0.1 (not yet released)
+## node-leader 0.0.1 (not yet released)
 
 - Initial creation.
